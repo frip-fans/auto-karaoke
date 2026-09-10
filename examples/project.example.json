@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "title": "Local karaoke preview",
+  "source": "source.mp4",
+  "clip_start_seconds": 60,
+  "clip_duration_seconds": 30,
+  "lyrics": "lyrics.json",
+  "work_dir": "work",
+  "ffmpeg": "ffmpeg",
+  "font_path": "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf",
+  "font_family": "IPAGothic",
+  "threads": 4,
+  "align_device": "auto",
+  "transcribe_device": "auto",
+  "vocals": {"path": "logic-vocals.wav", "origin_seconds": 0},
+  "instrumental": {"path": "logic-instrumental.wav", "origin_seconds": 0}
+}

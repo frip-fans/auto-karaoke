@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "note": "Self-created test phrase, not transcribed from any song. Replace locally with reviewed lyrics.",
+  "lines": [
+    {"id": "line-01", "tokens": [["青い", "あおい"], ["空", "そら"]]}
+  ]
+}
