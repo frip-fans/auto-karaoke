@@ -14,7 +14,8 @@ ALLOWED_NAMES = {'LICENSE', 'plugins/auto-karaoke/LICENSE', '.gitignore', 'examp
                  'player/static/index.html', 'player/static/styles.css', 'player/static/app.js',
                  'player/static/audio.js', 'player/static/display.html', 'player/static/display.js',
                  'player/tests/browser.cjs', 'plugins/auto-karaoke/.codex-plugin/plugin.json',
-                 '.agents/plugins/marketplace.json'}
+                 '.agents/plugins/marketplace.json', '.claude-plugin/marketplace.json',
+                 'plugins/auto-karaoke/.claude-plugin/plugin.json'}
 # Only these reviewed screenshot bytes are allowed; all other media remain forbidden.
 ALLOWED_SCREENSHOTS = {'docs/images/sample-english.jpg': '38a7e56cb44485ccb42f1bf5ce8a731ecfacc36a458cb6c17347108daa1b23da', 'docs/images/sample-japanese.jpg': 'edfb2858e2b3ae4c6ebc34b3c0c18689a93a24239dce8659b70c794f94939f22', 'docs/images/sample-title.jpg': '07bc6aa707e8bb86a48aeb5ee49258b7710a20e2a7fcd1bace336e045da386b0'}
 FORBIDDEN_PARTS = {'.local', 'work', 'input', 'output', 'models', 'cache', '.venv', '__pycache__'}
