@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Karaoke · 本地唱片室</title><link rel="stylesheet" href="/static/styles.css"></head>
+<body>
+<header><a class="brand" href="/">K<span>◦</span> <b>本地唱片室</b></a><span class="local">● OFFLINE KARAOKE</span><div class="spacer"></div><button id="display">↗ 观众窗口</button><button id="import-open" class="primary">＋ 导入 MP4</button></header>
+<main>
+<section class="desk">
+<div id="stage"><video id="video" muted playsinline preload="metadata"></video><div id="empty"><span class="eyebrow">YOUR PRIVATE STAGE</span><h1>今晚，唱哪一首？</h1><p>从右侧曲库点歌，或导入你的卡拉 OK 视频。</p></div><button id="fullscreen" title="画面全屏">⛶</button></div>
+<div class="now"><div><small>正在播放</small><h2 id="now-title">等待点歌</h2><p id="now-meta">伴奏与纯人声 · 独立混音</p></div><span id="state">就绪</span></div>
+<div class="timeline"><span id="elapsed">0:00</span><input id="seek" aria-label="播放进度" type="range" min="0" max="1" step="0.01" value="0"><span id="duration">0:00</span></div>
+<div class="transport"><button id="restart" title="重新开始">↺</button><button id="play" class="primary">▶ 播放</button><button id="next">下一首 ⏭</button><div class="spacer"></div><button id="mute">静音</button><input id="master" aria-label="总音量" type="range" min="0" max="1" step=".01" value=".8"></div>
+<div class="mix-card"><div class="mix-heading"><div><h3>你的声音，站在前面</h3><p>保留伴奏，随时加入一点导唱。</p></div><span class="tag">STEM MIX</span></div><label class="fader">伴奏 <input id="backing" type="range" min="0" max="1" step=".01" value="1"><output id="backing-value">100%</output></label><label class="fader">纯人声 <input id="vocals" type="range" min="0" max="1" step=".01" value="0"><output id="vocals-value">0%</output></label><div class="mix-footer"><button id="guide">导唱关 · V</button><small id="audio-note">第二轨须为分离的纯人声</small></div></div>
+<p class="keyboard">Space 播放 / 暂停 · ← → 快进退 · V 导唱 · F 全屏</p>
+<details><summary>曲库位置与投屏</summary><p id="folder"></p><p>拷贝整个曲库文件夹即可搬家。用启动脚本指定该文件夹；队列、历史和音量只保存在当前浏览器。HDMI 请使用扩展屏幕，将观众窗口拖到电视后点击全屏；系统声音输出选择 HDMI。</p><label>画面延迟 <input id="delay" type="range" min="-300" max="300" step="10" value="0"><output id="delay-value">0 ms</output></label></details>
+</section>
+<section class="collection"><nav><button class="tab active" data-tab="library">曲库 <span id="library-count">0</span></button><button class="tab" data-tab="queue">待唱 <span id="queue-count">0</span></button><button class="tab" data-tab="history">最近唱过</button><div class="spacer"></div><button id="scan" title="扫描曲库文件夹">↻</button></nav><div class="search"><input id="search" placeholder="搜索歌曲、专辑、歌手…" aria-label="搜索曲库"></div><div id="albums"></div><div id="list"></div></section>
+</main>
+<div id="notice" role="status"></div>
+<dialog id="import-dialog"><form id="import-form"><h2>把歌曲带进唱片室</h2><p>选择一个或多个 MP4。文件会复制到曲库，可以整库搬走。</p><label>MP4 文件<input name="files" type="file" accept=".mp4,video/mp4" multiple required></label><div class="fields"><label>专辑<input name="album" placeholder="例如：infinite Resonance 4" required></label><label>歌手<input name="artist" placeholder="例如：fripSide"></label></div><label>版本<input name="version" value="专辑版" required></label><label>曲名（多文件导入时使用各自文件名）<input name="title" placeholder="留空使用文件名；导入后可修改"></label><p>同一专辑下曲名、歌手相同的条目会合并展示为不同版本。</p><footer><button type="button" data-close>取消</button><button class="primary" id="import-submit">导入曲库</button></footer></form></dialog>
+<dialog id="edit-dialog"><form id="edit-form"><h2>歌曲与版本</h2><label>曲名<input name="title" required></label><div class="fields"><label>专辑<input name="album" required></label><label>歌手<input name="artist"></label></div><label>版本<input name="version" required></label><details><summary>音轨对应关系</summary><p>仅将分离的 vocal-only 轨道选为纯人声。Original Mix 是完整原曲，不是纯人声。</p><label>伴奏<select name="instrumental"></select></label><label>纯人声<select name="vocals"></select></label></details><footer><button type="button" data-close>取消</button><button class="primary">保存</button></footer></form></dialog>
+<script type="module" src="/static/app.js"></script></body></html>

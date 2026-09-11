@@ -165,3 +165,7 @@ python scripts/check_repo_content.py
 仓库只保存代码、文档、配置模板和自造测试数据。**不保存歌曲音视频、分轨、MV 截图、真实歌词、识别文本、成品字幕、模型权重或运行缓存，也不把它们写入 Git 历史。** `.gitignore` 和文本文件白名单检查用于降低误提交风险；新文档仍需人工检查，脚本不能判断一段文字的版权来源。
 
 更多：[服务器实测](docs/benchmarks.md) · [后续 pipeline](docs/pipeline.md) · [现成项目评估](docs/existing-projects.md)。
+
+## 离线卡拉 OK 点歌播放器
+
+[player/](player/README.md) 提供独立的 Mac 本地启动入口：导入 MP4、按专辑整理曲库、同曲多版本点播、伴奏与纯人声独立调音，以及 HDMI 观众窗口。曲库是可整体拷贝的文件夹；点歌队列和记录保存在浏览器。播放器只需 Flask、Waitress 和 FFmpeg，不依赖分离模型或 PyTorch。
