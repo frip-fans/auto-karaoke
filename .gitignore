@@ -60,7 +60,5 @@ render-report.json
 /.claude/settings.local.json
 /.claude/worktrees/
 
-# Portable player's private library and runtime files.
-/player/songs/
-/player/.venv/
+# Rebuildable audio caches in local portable libraries.
 .karaoke-cache/

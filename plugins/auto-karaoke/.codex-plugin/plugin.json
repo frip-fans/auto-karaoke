@@ -1,0 +1,23 @@
+{
+  "name": "auto-karaoke",
+  "version": "0.1.0+codex.20260911131303",
+  "description": "Local audio separation, reviewed karaoke authoring and dual-stem video rendering.",
+  "author": {
+    "name": "frip-fans"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Auto Karaoke",
+    "shortDescription": "Separate audio, review lyrics, render karaoke videos.",
+    "longDescription": "Environment setup plus three production skills backed by the auto-karaoke CLI. Check system capabilities, install task dependencies, and produce reviewed karaoke media.",
+    "developerName": "frip-fans",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "Check this computer and set up karaoke audio separation.",
+      "Help me review and align these Japanese lyrics.",
+      "Render a karaoke video using my reviewed timing."
+    ]
+  },
+  "license": "GPL-3.0-only"
+}

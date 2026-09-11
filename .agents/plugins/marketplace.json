@@ -1,0 +1,20 @@
+{
+  "name": "frip-fans",
+  "interface": {
+    "displayName": "Frip Fans"
+  },
+  "plugins": [
+    {
+      "name": "auto-karaoke",
+      "source": {
+        "source": "local",
+        "path": "./plugins/auto-karaoke"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

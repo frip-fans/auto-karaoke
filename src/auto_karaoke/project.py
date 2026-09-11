@@ -25,7 +25,7 @@ class Project:
         self.root = self.path.parent
         self.work = self.resolve(self.config.get("work_dir", "work"))
         self.source = self.resolve(self.config["source"])
-        self.lyrics = self.resolve(self.config["lyrics"])
+        self._lyrics = self.resolve(self.config["lyrics"]) if self.config.get("lyrics") else None
         self.start = float(self.config.get("clip_start_seconds", 0))
         self.duration = float(self.config.get("clip_duration_seconds", 30))
         if not math.isfinite(self.start) or self.start < 0 or not math.isfinite(self.duration) or self.duration <= 0:
@@ -41,7 +41,9 @@ class Project:
         self.cache = self.work / "cache"
         self.cache.mkdir(exist_ok=True)
         # Output paths may never collide with an input/configuration file.
-        self.inputs = {self.path, self.source, self.lyrics}
+        self.inputs = {self.path, self.source}
+        if self._lyrics is not None:
+            self.inputs.add(self._lyrics)
         if self.font:
             self.inputs.add(self.font)
         for name in ("vocals", "instrumental"):
@@ -49,6 +51,12 @@ class Project:
                 self.inputs.add(self.resolve(self.config[name]["path"]))
         if self.config.get("overrides"):
             self.inputs.add(self.resolve(self.config["overrides"]))
+
+    @property
+    def lyrics(self):
+        if self._lyrics is None:
+            raise ValueError("This stage needs lyrics; set lyrics in the project configuration")
+        return self._lyrics
 
     def resolve(self, value):
         path = Path(value).expanduser()

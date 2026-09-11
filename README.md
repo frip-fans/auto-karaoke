@@ -1,171 +1,49 @@
 # auto-karaoke
 
-日语卡拉 OK 制作实验：**日语原文 + 假名注音 + 逐词／音拍变色**，保留原 MV / live 画面，导出 MP4，并可替换为 Logic Pro 分离的伴奏。
+日语卡拉 OK 视频制作工具。支持音轨分离、歌词对齐、汉字注音、逐词／音拍扫色和歌手配色，输出伴奏与纯人声双轨 MP4。
 
-后续主要运行环境是用户的本地 GPU PC。本仓库保存已完成的服务器实验、可运行的短片段原型，以及接下来给本地 Codex 的工作说明。当前 GPU 分支尚未在真实 GPU 上验证。
-
-## 先复用现成项目
-
-先读 [现成项目评估](docs/existing-projects.md)。Nightingale 已覆盖分离、对齐、歌词编辑和同步播放；它当前展示日语罗马字，播放高亮也不同于假名逐音拍扫色。Karaoke Video Maker 更接近日式字幕视频编辑，但尚未实现自动强制对齐。
-
-后续优先验证和接入这些项目。这里的 Python 代码是已有样片的可复现实验基线，不是另做一套完整播放器或字幕编辑器。
-
-## 当前实现
-
-| 阶段 | 实现与边界 |
+| Skill | 用途 |
 | --- | --- |
-| 导入 | 本地音频、MV 或 live 视频；选择固定片段；导入已有 vocals / instrumental |
-| 分离（可选） | 调用 `audio-separator`；默认小 MDX 模型；也可完全使用 Logic Pro |
-| 转写（可选） | faster-whisper small；结果只作为未校对草稿 |
-| 对齐 | NextFire 日语歌声 CTC 模型输出声学概率；Viterbi 对齐读音字符，聚合到 mora（音拍） |
-| 校对 | 手工确认歌词与假名；独立 `overrides.json` 修改起止时间 |
-| 字幕 | 无底部背景条；字号默认放大 20%；左上、右下两排固定交替接唱和预读；汉字上方注音逐音拍扫色 |
-| 导出 | FFmpeg / libass，720p H.264 + AAC；纯音频使用纯色背景 |
-| 换轨 | 保留编码后的视频流，按时间原点截取新伴奏并重新编码音频 |
+| `karaoke-setup` | 检查环境，经授权后安装或修复依赖 |
+| `audio-separate` | 从音频或视频中分离伴奏和纯人声 |
+| `karaoke-author` | 制作、校对歌词读音与时间轴 |
+| `karaoke-render` | 根据字幕数据和分轨生成视频 |
 
-已用真实 30 秒片段验证过原始样片流程；整理后的代码用合成音视频测试。实际歌词正确性、歌唱读法和时间轴仍需听音校对。`emit` 限制单段最多 60 秒；整曲自动分段与合并、多声部同时演唱、图形校对界面尚未实现。
+播放器独立维护：[auto-karaoke-player](https://github.com/frip-fans/auto-karaoke-player)。
 
-## 安装与运行
+## 安装
 
-建议 Python 3.12。GPU PC 的安装和验收步骤见 [本地 GPU PC / Codex 交接](docs/local-pc.md)。仅使用已对齐数据生成字幕和视频时，基础依赖不包含 PyTorch。
+需要可运行 Codex 的电脑、可用磁盘空间及首次安装时的网络连接。制作工具使用 Python 3.11+、FFmpeg；渲染日语字幕还需要日文字体。分离和对齐建议使用 NVIDIA GPU，CPU 也可运行，但速度较慢。具体模型能否运行，由插件检查硬件和所需后端。
+
+在本仓库根目录安装插件，无需先手动配置 Python 环境：
 
 ```bash
-python -m venv .venv
-# Linux / macOS / WSL
-source .venv/bin/activate
-# Windows PowerShell 改用：.venv\Scripts\Activate.ps1
-python -m pip install -e .
-# 需要声学对齐时，再安装对应平台的 PyTorch，然后：
-python -m pip install -e '.[align]'
+codex plugin marketplace add .
+codex plugin add auto-karaoke@frip-fans
 ```
 
-还需要带 `ass` 滤镜和 `libx264` 编码器的 FFmpeg，以及单字体 TTF/OTF 日文字体。字体不随仓库分发；TTC 字体集合暂不支持。`font_family` 必须对应 `font_path` 中实际字体的家族名。
+新开 Codex 会话后，告诉它你要做什么：
 
-把所有素材、歌词和项目配置放在 Git 忽略的 `.local/` 下：
-
-```bash
-mkdir -p .local/demo
-cp examples/project.example.json .local/demo/project.json
-cp examples/lyrics.example.json .local/demo/lyrics.json
+```text
+$karaoke-setup 检查我的电脑，告诉我分离音轨还需要安装什么。
 ```
 
-修改项目 JSON 的素材、字体、起点和时长；示例中的 Linux 字体路径需要按本机修改。**所有相对路径均相对于项目 JSON**，包括 `replace-audio` 的路径参数。示例短语为自造测试文字，必须在本地换成所选片段的已校对歌词。
+Codex 可以先做只读检查。需要安装依赖、创建环境或下载模型时，会列出具体内容和安装位置，询问你是否同意；得到明确授权后才执行。制作 skills 也遵守这一规则。
 
-导入 Logic Pro 分轨的流程：
+## 使用
 
-```bash
-auto-karaoke --project .local/demo/project.json doctor --ml
-auto-karaoke --project .local/demo/project.json prepare
-auto-karaoke --project .local/demo/project.json emit
-auto-karaoke --project .local/demo/project.json align
-auto-karaoke --project .local/demo/project.json subtitles
-auto-karaoke --project .local/demo/project.json render
+```text
+$audio-separate 将这份 MV 分离成伴奏和纯人声，使用 MDX23C。
+$karaoke-author 用歌词和分轨制作时间轴，列出需要我校对的地方。
+$karaoke-render 用已确认的时间轴和 background.png 生成 1080p 视频。
 ```
 
-没有分轨时，先删除配置中的 `vocals`、`instrumental` 两项，安装分离扩展，在 `prepare` 后执行：
+也可直接使用 `auto-karaoke` CLI，详见 [命令与字幕参数](docs/production.md)。歌词与读音需要人工校对；当前声学对齐命令单次支持最多 60 秒。
 
-```bash
-python -m pip install -e '.[separate]'
-auto-karaoke --project .local/demo/project.json separate
-```
+双轨输出设置为 `dual_audio: true`、`dual_audio_source: "vocals"`：第一轨是伴奏 `Instrumental`，第二轨是纯人声 `Vocals`。
 
-需要识别草稿时安装 `.[transcribe]`，在分离或导入 vocals 后运行 `transcribe`；它不会覆盖你确认的 `lyrics.json`。`emit` 和 `transcribe` 默认允许下载模型，`--offline` 仅使用本地缓存。模型及处理产物默认在项目 `work/cache/` 和 `work/`，不上传远端服务。
+[插件安装说明](plugins/auto-karaoke/README.md) · [歌词标注器](tools/lyric-annotator.html)
 
-输出：`work/karaoke.ass`、`work/timing.json`、`work/karaoke-original.mp4`；有伴奏时还生成 `work/karaoke-instrumental.mp4`。这些文件均不提交 Git。
+## License
 
-设置 `"dual_audio": true` 后，额外生成 `work/karaoke-dual-audio.mp4`：一条视频流、两条同步音轨。第一条音轨为默认伴奏（`Instrumental`），第二条默认是分离人声（`Vocals`）；视频和已编码伴奏直接复制，人声 WAV 编码一次 AAC。设置 `dual_audio_source: "original_mix"` 可改为原唱混音。普通播放器可切换音轨；自制播放器需同时解码两路音频，再按 `伴奏增益 × Instrumental + 人声增益 × Vocals` 混音，默认人声增益可设为 0，并为叠加保留音量余量。
-
-`background_image` 可指定静态背景，`render_width` / `render_height` 可指定输出尺寸（例如 1920×1080）；源音轨仍来自 `source`。不指定背景时保留原视频画面。
-
-NVIDIA GPU 可在项目配置中设置 `"video_encoder": "h264_nvenc"`，使用 NVENC 的 p5 / HQ / VBR 编码；`"video_quality": 20` 控制 CQ，值越低通常质量越高。默认仍为 `libx264` fast，此时同一字段控制 CRF；CQ 与 CRF 数值不能视为等效画质。当前解码、缩放和 libass 字幕绘制仍在 CPU 上。需要 FFmpeg 支持 NVENC 且运行环境可访问 GPU；显式选择 GPU 后不可用会报错，不会静默改用 CPU。
-
-## 歌词与时间轴
-
-`lyrics.json` 每个 token 为 `[显示原文, 平假名读音]`。单音拍助词可加第三项标明实际发音，例如 `["は", "は", "wa"]`。长音请展开成实际平假名读音；英文词可用 `language: "en"` 或逐词 `token_languages` 标记，读音使用模型支持的小写字母；多音拍发音覆盖和跨 token 促音仍需进一步实现和校对。
-
-注音仅放在连续汉字上方，词中的假名作为读音边界，不重复显示注音。例如 `食べる / たべる` 只给 `食` 标 `た`，`引き出す / ひきだす` 分别给 `引`、`出` 标 `ひ`、`だ`。读音无法匹配这些边界时会报错，需要校正读音或分词。相邻英文词保留可见空格。
-
-`subtitle_font_scale` 默认为 `1.2`，同时放大正文与注音；过长的行会缩小到安全边界。每段内奇数句固定在左上排，偶数句固定在右下排，从预读到唱完都不换排：第一句结束后，上排换成第三句，第二句继续在下排演唱。达到长间隔阈值（默认 6 秒）后，新段落重新从上排开始。长间奏中的预读最多提前 8 秒，避免一直挂着遥远的下一句。
-
-正式导出可设置 `"show_preview_label": false`，去掉右上角的草稿提示。标题和歌手图例独立保留。引号和标点不参与读音匹配，汉字注音仍对应实际汉字位置。
-
-正文与注音默认使用更粗的黑色描边，可用 `subtitle_outline`（默认 4）和 `ruby_outline`（默认 2.2）调整。`intro_card` 可设置 `title`、`artist`、`album`、`vocals` 和 `seconds`，在开头居中显示；`outro_card` 沿用相同信息，可单独设置 `seconds`。本批专辑开头和结尾各显示 10 秒，不延长音视频，底部歌词照常显示。
-
-英文词可通过行级 `language: "en"` 或逐 token 的 `token_languages` 指定，以声学字符路径聚合为词级时间；不会把英文词伪装成日语音拍。`token_singers` 可保留 Word 行内轮唱对应的颜色。自动词典读音和复杂重叠演唱仍需试听复核。
-
-长间隔后的三点倒数是默认功能，没有开关：`● ● ● → ● ● → ● → 无圆点 → 开唱`，每个阶段至少 1 秒，按音乐拍点向前取整；最后一个点消失后再保留一个同节奏的准备间隔。圆点放在即将开唱的歌词前方，与正文、注音一起显示；该句保留圆点前缀的空间，避免圆点消失时歌词左右跳动。默认间隔阈值为 6 秒，可用 `countdown.min_gap_seconds` 调整。安装 `.[rhythm]` 后，`subtitles` 会在需要时自动分析本地 `original.wav` 的节拍；也可先运行 `beats`。缓存为 `work/beats.json`，需人工调整时可通过 `countdown.beats_file` 指定同一时间轴的节拍文件。节拍不足、过旧或明显不规则时不编造倒数。此提示依据自动检测的音乐节拍，仍需试听校验。
-
-### 可选的手工歌手配色
-
-已有带格式的 Word 歌词可先批量导入：
-
-```bash
-python scripts/import_docx_lyrics.py .local/album --output .local/album/lyrics-import
-```
-
-DOCX 导入器保留段落和手动换行，根据每段标题中人名的普通字／斜体／加粗格式建立局部映射；映射可随段落反转，整曲 solo 标记也会保留。行内多个角色保存到 `singer_segments`，整行暂标为 `unknown` 待审核，不擅自把轮唱或括号和声合并为整句合唱。输出尚无读音和声学时间戳，可用下方单页工具继续处理。默认不覆盖已有输出，重跑需显式传入 `--overwrite`。
-
-推荐直接打开独立单页 [歌词标注器](tools/lyric-annotator.html)，无需启动服务器或安装前端依赖：
-
-1. 载入项目 `lyrics.json` 或 `timing.json`；也支持 TXT / LRC 草稿。
-2. 添加歌手，修改姓名、歌手颜色和独立合唱颜色。
-3. 选择左侧歌手画笔，点击歌词逐句标记；Shift + 单击可标记连续多句，支持撤销、重做与筛选。
-4. 点击“另存为新歌词文件”。输出 `*-annotated.json`，保留原 JSON 的读音、音拍时间轴和其他字段，增加歌手表及每行标记。可再次载入继续编辑。
-5. 用下方 `import-singers --file ... --enable` 导入这个完整歌词文件。导入只更新分唱标记和配色，不覆盖已有歌词或时间轴；不同曲目的行 ID 或歌词文字不匹配会报错。
-
-可另选本地音频逐句试听。TXT/LRC 导入会生成结构化 JSON 草稿，尚需读音与声学对齐；给已有视频配色时，优先载入对应项目的 JSON，保留稳定行 ID。页面不会上传文件，也不会自动覆盖源文件。
-
-只有歌手配色有开关：`"singer_colors_enabled": false` 为默认关闭；打开后读取独立的 `singer_map`。默认颜色为 `mao`（上杉真央，粉色）、`hisayo`（阿部寿世，黄色）、`duet`（二人合唱，橙色），`unknown` 为未标注。也支持 A/B 及自定义 `singers` 颜色表。关闭时不加载标记文件，统一使用白字和黄色扫色。
-
-启用歌手配色后，第一位歌手及每次歌手切换的那句会在注音上方显示 `【姓名】`／`【合唱】` 标签（44 号字），与该句颜色一致；同一歌手连续演唱不重复显示。标签从该句预读出现到结束，跟随所属歌词排，未知歌手不显示姓名。
-
-```bash
-auto-karaoke --project .local/demo/project.json singer-template
-auto-karaoke --project .local/demo/project.json singer-review
-auto-karaoke --project .local/demo/project.json import-singers --file annotations.json --enable
-auto-karaoke --project .local/demo/project.json subtitles
-auto-karaoke --project .local/demo/project.json render
-```
-
-`singer-review` 导出本地逐句试听页面，可选择演唱者并下载 JSON；网页不会自动写回项目，下载后用 `import-singers` 导入。导入相对路径以项目 JSON 为基准。没有配置 `singer_map` 时默认使用 `work/singer-map.json`。模板不会覆盖现有文件，导入会保留未修改的行，并保存前一版标记备份。改配色或分唱标记不需要重跑音拍对齐。
-
-可按行 ID 或完整时间段标记，示例为结构说明：
-
-```json
-{
-  "schema_version": 1,
-  "lines": {"line-01": "mao", "line-02": "hisayo"},
-  "ranges": [{"start": 30, "end": 45, "singer": "duet"}]
-}
-```
-
-时间以当前项目片段为零点。时间段必须完整覆盖歌词行；截断一行、重叠指定同一行或无效 ID 会报错。行 ID 指定优先于时间段。此入口不会自动识别歌手，模型方向见 [歌手识别评估](docs/singer-identification.md)。
-
-`timing.json` 保存 `raw_end`、置信分值、音拍 ID 和自动时间。置信分值仅用于定位可疑点，不代表歌词准确率。将修正写入项目 `work/overrides.json`：
-
-```json
-{
-  "syllables": {
-    "line-01-word-01-mora-01": {"start": 0.32, "end": 0.48, "review_note": "人工校对"}
-  }
-}
-```
-
-时间以当前片段起点为 0；上面仅为结构示例，实际起止必须满足整体不重叠。重跑 `align` 保留独立 overrides；变更歌词分词后必须重新核对 ID。换人声音轨后重跑 `emit → align → subtitles → render`；只替换同一时间轴的伴奏可直接换轨，见 [Logic Pro 交接](docs/logic-pro.md)。更换源文件或裁切范围时使用新的 `work_dir`，避免混用旧产物。
-
-## 验证与仓库素材边界
-
-```bash
-python -m unittest discover -s tests -v
-python scripts/check_repo_content.py
-```
-
-测试动态生成正弦音、纯色视频和自造日语短语，不下载歌曲或模型。集成测试需要 FFmpeg 和日文字体；可通过 `AUTO_KARAOKE_FFMPEG`、`AUTO_KARAOKE_TEST_FONT` 设置路径。
-
-仓库只保存代码、文档、配置模板和自造测试数据。**不保存歌曲音视频、分轨、MV 截图、真实歌词、识别文本、成品字幕、模型权重或运行缓存，也不把它们写入 Git 历史。** `.gitignore` 和文本文件白名单检查用于降低误提交风险；新文档仍需人工检查，脚本不能判断一段文字的版权来源。
-
-更多：[服务器实测](docs/benchmarks.md) · [后续 pipeline](docs/pipeline.md) · [现成项目评估](docs/existing-projects.md)。
-
-## 离线卡拉 OK 点歌播放器
-
-[player/](player/README.md) 提供独立的 Mac 本地启动入口：导入 MP4、按专辑整理曲库、同曲多版本点播、伴奏与纯人声独立调音，以及 HDMI 观众窗口。曲库是可整体拷贝的文件夹；点歌队列和记录保存在浏览器。播放器只需 Flask、Waitress 和 FFmpeg，不依赖分离模型或 PyTorch。
+[GPLv3](LICENSE) (`GPL-3.0-only`)。第三方依赖与模型权重遵循各自的许可证。

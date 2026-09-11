@@ -19,6 +19,18 @@ from auto_karaoke.singers import import_singers, singer_styles
 
 
 class CoreTests(unittest.TestCase):
+    def test_audio_only_project_does_not_require_lyrics(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_json(root / 'project.json', {'schema_version': 1, 'source': 'input.wav'})
+            project = Project(root / 'project.json')
+            self.assertEqual(project.source, root / 'input.wav')
+            self.assertEqual(project.output('vocals.wav'), root / 'work/vocals.wav')
+            with self.assertRaisesRegex(ValueError, 'needs lyrics'):
+                align(project)
+            with self.assertRaises(ValueError):
+                project.output('../input.wav')
+
     def test_english_words_keep_acoustic_spans_and_token_singers(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -214,6 +226,26 @@ class CoreTests(unittest.TestCase):
 
 
 class SyntheticIntegrationTests(unittest.TestCase):
+    def test_prepare_audio_without_lyrics_or_fonts(self):
+        import soundfile as sf
+        ffmpeg = os.environ.get('AUTO_KARAOKE_FFMPEG') or shutil.which('ffmpeg')
+        if not ffmpeg:
+            self.skipTest('FFmpeg required')
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            samples = .05 * np.sin(2 * np.pi * 440 * np.arange(44100) / 44100)
+            sf.write(root / 'input.wav', samples, 44100)
+            write_json(root / 'project.json', {'schema_version': 1, 'source': 'input.wav',
+                       'clip_duration_seconds': 1, 'ffmpeg': ffmpeg})
+            project = Project(root / 'project.json')
+            prepare(project)
+            result, rate = sf.read(project.output('original.wav'), always_2d=True)
+            self.assertEqual((len(result), rate, result.shape[1]), (44100, 44100, 2))
+            self.assertTrue(np.isfinite(result).all())
+            self.assertGreater(float(np.corrcoef(samples, result[:, 0])[0, 1]), .999)
+            self.assertFalse((root / 'lyrics.json').exists())
+
+
     def test_align_render_and_lossless_video_remux(self):
         import av
         import soundfile as sf

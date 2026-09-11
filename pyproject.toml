@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,6 +7,8 @@ name = "auto-karaoke"
 version = "0.1.0"
 description = "Local Japanese karaoke prototype with furigana and replaceable audio"
 readme = "README.md"
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 dependencies = ["numpy>=1.26,<3", "Pillow>=10,<13", "soundfile>=0.12,<1", "av>=13,<19", "pykakasi>=2.3,<3"]
 
