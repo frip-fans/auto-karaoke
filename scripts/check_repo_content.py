@@ -6,7 +6,12 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_SUFFIXES = {'.py', '.md', '.toml', '.yaml', '.yml'}
-ALLOWED_NAMES = {'.gitignore', 'examples/project.example.json', 'examples/lyrics.example.json'}
+ALLOWED_NAMES = {'.gitignore', 'examples/project.example.json', 'examples/lyrics.example.json',
+                 'tools/lyric-annotator.html', 'tests/test_lyric_annotator.cjs',
+                 'player/requirements.txt', 'player/Start Karaoke.command',
+                 'player/static/index.html', 'player/static/styles.css', 'player/static/app.js',
+                 'player/static/audio.js', 'player/static/display.html', 'player/static/display.js',
+                 'player/tests/browser.cjs'}
 FORBIDDEN_PARTS = {'.local', 'work', 'input', 'output', 'models', 'cache', '.venv', '__pycache__'}
 
 

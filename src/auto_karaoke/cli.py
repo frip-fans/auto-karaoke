@@ -14,6 +14,12 @@ def main():
     commands.add_parser("doctor").add_argument("--ml", action="store_true", help="Also inspect installed ML backends without downloading models")
     for name in ("prepare", "align", "subtitles", "render"):
         commands.add_parser(name)
+    commands.add_parser("beats", help="Detect local musical beats for entrance countdowns")
+    commands.add_parser("singer-template", help="Create a manual singer annotation template")
+    commands.add_parser("singer-review", help="Export a local singer annotation page")
+    singer_import = commands.add_parser("import-singers", help="Import manually assigned lines or time ranges")
+    singer_import.add_argument("--file", required=True)
+    singer_import.add_argument("--enable", action="store_true", help="Enable singer colors after import")
     for name in ("emit", "transcribe"):
         commands.add_parser(name).add_argument("--offline", action="store_true")
     commands.add_parser("separate").add_argument("--model", default="UVR-MDX-NET-Inst_HQ_3.onnx")
@@ -65,5 +71,17 @@ def main():
         elif args.command == "subtitles":
             from .subtitles import subtitles
             subtitles(project)
+        elif args.command == "beats":
+            from .rhythm import detect_beats
+            detect_beats(project)
+        elif args.command == "singer-template":
+            from .singers import export_singer_map
+            export_singer_map(project)
+        elif args.command == "singer-review":
+            from .singer_review import export_review
+            export_review(project)
+        elif args.command == "import-singers":
+            from .singers import import_singers
+            import_singers(project, project.resolve(args.file), enable=args.enable)
     except (ValueError, FileNotFoundError, ImportError, subprocess.CalledProcessError) as exc:
         parser.exit(1, f"{args.command} failed: {exc}\nCheck the project configuration, optional dependencies and work/*.log.\n")

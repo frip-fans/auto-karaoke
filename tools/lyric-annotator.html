@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分唱标记 · Auto Karaoke</title>
+<style>
+:root{color-scheme:dark;--bg:#101116;--panel:#191b23;--line:#30333f;--text:#edeef4;--muted:#9da3b4;--accent:#b8a2ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#242733;color:var(--text);border-radius:8px;padding:8px 13px}button:hover{background:#35394a}button:disabled{opacity:.38;cursor:default}button.primary{background:var(--accent);color:#171322;border-color:var(--accent);font-weight:650}button.quiet{background:transparent}button:focus-visible,input:focus-visible,.lyric:focus-visible{outline:2px solid var(--accent);outline-offset:3px}input[type=text],input[type=search]{background:#11131b;border:1px solid var(--line);color:var(--text);border-radius:7px;padding:8px 10px;min-width:0}input[type=color]{border:0;padding:0;background:none;width:32px;height:32px;cursor:pointer}header{height:auto;min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 30px;border-bottom:1px solid var(--line)}h1{font-size:23px;margin:0;font-weight:650;letter-spacing:.02em}.eyebrow{color:var(--accent);font-size:11px;letter-spacing:.16em}header p{margin:2px 0 0;color:var(--muted);font-size:13px}.actions{display:flex;flex-wrap:wrap;gap:8px}.app{display:grid;grid-template-columns:300px minmax(0,1fr);max-width:1500px;margin:auto}aside{padding:26px 22px;border-right:1px solid var(--line);min-height:calc(100vh - 88px)}h2{font-size:12px;color:var(--muted);font-weight:650;letter-spacing:.09em;margin:0 0 12px}.speaker{display:grid;grid-template-columns:1fr 32px 26px;gap:7px;align-items:center;margin:8px 0}.brush{display:flex;align-items:center;gap:10px;text-align:left;min-width:0;padding:10px;border-left:4px solid var(--voice);background:var(--panel)}.brush.active{outline:2px solid var(--voice);outline-offset:1px}.brush span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.swatch{width:9px;height:9px;border-radius:50%;background:var(--voice);flex:none}.remove{padding:3px;border:0;color:var(--muted);background:transparent}.name-edit{width:100%;font-size:12px;margin:0 0 4px}.add{width:100%;margin:10px 0 20px}.aside-note{font-size:12px;color:var(--muted)}.legend-preview{margin-top:25px;padding:18px 14px;border:1px solid var(--line);border-radius:10px;background:#13151d}.legend-preview p{margin:6px 0}.audio-panel{margin-top:26px}audio{width:100%;height:36px;margin-top:10px}.file-label{font-size:12px;word-break:break-all;color:var(--muted)}main{padding:25px 30px 60px;min-width:0}.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}.toolbar input{flex:1;min-width:160px}.stats{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:14px 0}.stats strong{color:var(--text)}.status{min-height:25px;font-size:13px;color:#bedccf;margin:4px 0 12px}.status.error{color:#ffa6ad}.empty{border:1px dashed #49455d;border-radius:16px;padding:65px 24px;text-align:center;margin-top:25px}.empty h3{font-size:22px;font-weight:500;margin:0 0 10px}.empty p{color:var(--muted);margin:8px 0 22px}.drop-active{outline:3px dashed var(--accent);outline-offset:-8px}.hint{font-size:12px;color:var(--muted);margin:8px 0 18px}.lyric{display:grid;grid-template-columns:42px 56px minmax(0,1fr) auto;gap:14px;align-items:center;border:1px solid var(--line);border-left:4px solid var(--voice,#586071);background:var(--panel);border-radius:10px;padding:15px 16px;margin:9px 0;cursor:pointer;transition:background .1s}.lyric:hover{background:#222532}.lyric.playing{box-shadow:0 0 0 2px var(--accent)}.number{font:12px ui-monospace,monospace;color:var(--muted)}.play{padding:5px 7px;font-size:12px}.words{font-size:19px;line-height:1.6;overflow-wrap:anywhere}.line-meta{font-size:11px;color:var(--muted)}.badge{font-size:12px;color:var(--voice);border:1px solid currentColor;border-radius:20px;padding:3px 10px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;margin-top:25px}#fileName{word-break:break-all}#empty[hidden],#list[hidden]{display:none}dialog{border:1px solid #55506d;border-radius:12px;background:var(--panel);color:var(--text);padding:24px;max-width:400px}dialog::backdrop{background:#0009}dialog label{display:block;margin:12px 0}dialog input[type=text]{width:100%}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}@media(max-width:800px){header{padding:18px;align-items:flex-start;flex-direction:column}.app{grid-template-columns:1fr}aside{min-height:auto;border-right:0;border-bottom:1px solid var(--line);padding:20px}.speakers{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0 18px}.audio-panel,.legend-preview{margin-top:12px}main{padding:20px}.lyric{grid-template-columns:26px 40px 1fr;gap:8px;padding:12px}.badge{grid-column:3;justify-self:start}.words{font-size:18px}}
+header{position:sticky;top:0;z-index:5;background:var(--bg)}aside{position:sticky;top:var(--header-height,88px);align-self:start;min-height:0;height:calc(100dvh - var(--header-height,88px));overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.toolbar{position:sticky;top:var(--header-height,88px);z-index:3;background:var(--bg);padding:8px 0}@media(max-width:800px){aside{position:static;height:auto;max-height:none;overflow:visible}}
+</style>
+</head>
+<body>
+<header><div><div class="eyebrow">AUTO KARAOKE / LYRIC ANNOTATOR</div><h1>给每一句，标上演唱者。</h1><p>选一个歌手，点一下歌词。所有文件都留在你的浏览器里。</p></div><div class="actions"><button id="open">载入歌词</button><button id="save" class="primary" disabled>另存为新歌词文件</button></div></header>
+<input id="file" type="file" accept=".json,.lrc,.txt,application/json,text/plain" hidden><input id="audioFile" type="file" accept="audio/*,video/*" hidden>
+<div class="app"><aside><h2>标记画笔</h2><div class="speakers" id="speakers"></div><button class="add quiet" id="add">＋ 添加歌手</button><p class="aside-note">点击歌手卡片选择画笔。下方可改姓名，右侧色块可改颜色。合唱拥有独立颜色。</p><div class="legend-preview"><h2>当前画笔</h2><p id="brushName">上杉真央</p><small class="aside-note">点歌词即可标记；选「未标注」可清除。</small></div><div class="audio-panel"><button id="openAudio" class="quiet">＋ 载入音频，边听边标</button><audio id="audio" controls hidden></audio><div id="audioName" class="file-label"></div><p class="aside-note">音频为可选。带时间轴的歌词可逐句试听，请使用与歌词时间轴一致的音频。</p></div></aside>
+<main><div class="toolbar"><input id="search" type="search" placeholder="搜索歌词…" aria-label="搜索歌词"><button id="onlyUnknown">只看未标注</button><button id="undo" disabled>撤销</button><button id="redo" disabled>重做</button></div><div class="stats"><span id="fileName">尚未载入文件</span><span>共 <strong id="total">0</strong> 句</span><span>已标 <strong id="assigned">0</strong> 句</span><span id="dirty"></span></div><div id="status" class="status" role="status" aria-live="polite"></div><div class="hint">单击标记一句 · Shift + 单击批量标记连续歌词 · Ctrl/⌘ + Z 撤销</div>
+<div id="empty" class="empty"><h3>把歌词文件拖到这里</h3><p>支持项目 JSON、LRC、TXT<br>保留 JSON 的读音、时间轴和其他字段，另存为带歌手信息的 JSON。</p><button id="openEmpty" class="primary">选择歌词文件</button></div><div id="list" hidden></div><div class="foot">不上传、不自动覆盖源文件。另存文件包含歌手、颜色、合唱颜色与逐句标记，可再次载入编辑。</div></main></div>
+<dialog id="addDialog"><form method="dialog" id="addForm"><h3>添加歌手</h3><label>姓名<input id="newName" type="text" maxlength="80" required></label><label>颜色 <input id="newColor" type="color" value="#8ac8ff"></label><div class="dialog-actions"><button type="button" id="cancelAdd">取消</button><button class="primary" type="submit">添加</button></div></form></dialog>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const clone=value=>JSON.parse(JSON.stringify(value));
+const defaults={mao:{label:'上杉真央',color:'#FF76B5'},hisayo:{label:'阿部寿世',color:'#FFE45C'},duet:{label:'合唱',color:'#FF9D45',kind:'chorus'},unknown:{label:'未标注',color:'#8891A5'}};
+let doc=null, palette=clone(defaults), selected='mao', originalName='', dirty=false, anchor=null, onlyUnknown=false, audioURL=null, stopAt=null;
+let history=[], future=[];
+function say(text,error=false){$('status').textContent=text;$('status').classList.toggle('error',error);}
+function record(){history.push({doc:clone(doc),palette:clone(palette),selected});if(history.length>80)history.shift();future=[];}
+function changed(){dirty=true;refresh();}
+function snapshot(){return {doc:clone(doc),palette:clone(palette),selected};}
+function restore(state){doc=state.doc;palette=state.palette;selected=state.selected;anchor=null;dirty=true;render();}
+function undo(){if(!history.length)return;future.push(snapshot());restore(history.pop());say('已撤销。');}
+function redo(){if(!future.length)return;history.push(snapshot());restore(future.pop());say('已重做。');}
+function textOf(line){const parts=Array.isArray(line.tokens)?line.tokens.map(t=>Array.isArray(t)?t[0]:t.surface||t.text||''):null;if(typeof line.text==='string'&&(!parts||line.text!==parts.join('')))return line.text;if(parts)return parts.map((t,i)=>(i&&/[A-Za-z0-9][,.!?;:]*$/.test(parts[i-1])&&/^[A-Za-z0-9]/.test(t)?' ':'')+t).join('');return typeof line.text==='string'?line.text:'';}
+function startOf(line){return Number.isFinite(line.start)?line.start:Number.isFinite(line.anchor_start)?line.anchor_start:null;}
+function endOf(line){return Number.isFinite(line.end)?line.end:Number.isFinite(line.anchor_end)?line.anchor_end:null;}
+function who(line){return typeof line.singer==='string'?line.singer:'unknown';}
+function time(value){return value===null?'—':`${Math.floor(value/60)}:${(value%60).toFixed(2).padStart(5,'0')}`;}
+function safeId(id){return typeof id==='string'&&id.length>0&&!['__proto__','prototype','constructor'].includes(id);}
+function parseText(text,filename){
+ if(/\.json$/i.test(filename)||text.trimStart().startsWith('{'))return JSON.parse(text.replace(/^\uFEFF/,''));
+ const lines=[];for(const raw of text.replace(/^\uFEFF/,'').split(/\r?\n/)){if(!raw.trim())continue;
+  if(/\.lrc$/i.test(filename)){
+   const stamps=[...raw.matchAll(/\[(\d+):(\d{1,2}(?:\.\d+)?)\]/g)];const words=raw.replace(/\[[^\]]*\]/g,'').trim();
+   if(!stamps.length||!words)continue;for(const m of stamps)lines.push({text:words,start:Number(m[1])*60+Number(m[2])});
+  }else lines.push({text:raw.trim()});
+ }
+ if(/\.lrc$/i.test(filename))lines.sort((a,b)=>a.start-b.start);
+ return {schema_version:1,status:'draft_needs_readings_and_alignment',source_format:/\.lrc$/i.test(filename)?'lrc':'txt',lines};
+}
+function validate(value){
+ if(!value||typeof value!=='object'||Array.isArray(value)||!Array.isArray(value.lines)||!value.lines.length)throw Error('需要包含 lines 数组的歌词 JSON，或非空 TXT/LRC。');
+ if(value.lines.length>10000)throw Error('一次最多载入 10,000 句。');
+ const copy=clone(value), ids=new Set();
+ copy.lines.forEach((line,i)=>{if(!line||typeof line!=='object'||Array.isArray(line)||!textOf(line).trim())throw Error(`第 ${i+1} 句缺少歌词文字或 tokens。`);
+  if(line.id===undefined)line.id=`line-${String(i+1).padStart(4,'0')}`;
+  if(!safeId(line.id)||ids.has(line.id))throw Error(`第 ${i+1} 句的 ID 无效或重复。`);ids.add(line.id);
+  if(line.singer!==undefined&&!safeId(line.singer))throw Error(`第 ${i+1} 句的歌手标记无效。`);
+ });
+ const voices=copy.singers===undefined?clone(defaults):clone(copy.singers);
+ if(!voices||typeof voices!=='object'||Array.isArray(voices))throw Error('singers 必须是歌手 ID 到姓名/颜色的映射。');
+ for(const [id,p]of Object.entries(voices)){if(!safeId(id)||!p||typeof p.label!=='string'||!/^#[0-9a-f]{6}$/i.test(p.color))throw Error('歌手需要有效的 ID、label 和 #RRGGBB 颜色。');}
+ if(!Object.hasOwn(voices,'duet'))voices.duet=clone(defaults.duet);if(!Object.hasOwn(voices,'unknown'))voices.unknown=clone(defaults.unknown);
+ for(const line of copy.lines){const id=who(line);if(!Object.hasOwn(voices,id))voices[id]={label:id,color:'#A4B8EC'};}
+ return {doc:copy,palette:voices};
+}
+async function load(file){if(!file)return;if(dirty&&!confirm('当前修改还没有另存，要载入另一份文件吗？'))return;
+ try{if(file.size>20*1024*1024)throw Error('歌词文件超过 20 MB。');const next=validate(parseText(await file.text(),file.name));doc=next.doc;palette=next.palette;originalName=file.name;selected=Object.keys(palette).find(id=>!['duet','unknown'].includes(id))||'duet';dirty=false;history=[];future=[];anchor=null;onlyUnknown=false;$('search').value='';render();say(`已载入 ${doc.lines.length} 句。请选择歌手，然后点击歌词。`);}
+ catch(error){say('载入失败：'+error.message,true);}finally{$('file').value='';}
+}
+function renderSpeakers(){const box=$('speakers');box.replaceChildren();
+ for(const [id,p]of Object.entries(palette)){
+  const wrap=document.createElement('div'),row=document.createElement('div');row.className='speaker';
+  const button=document.createElement('button');button.className='brush'+(selected===id?' active':'');button.style.setProperty('--voice',p.color);button.dataset.singer=id;button.setAttribute('aria-pressed',String(selected===id));
+  const dot=document.createElement('i');dot.className='swatch';const label=document.createElement('span');label.textContent=p.label;button.append(dot,label);button.onclick=()=>{selected=id;renderSpeakers();refresh();};
+  const color=document.createElement('input');color.type='color';color.value=p.color;color.setAttribute('aria-label',p.label+'颜色');color.onchange=()=>{record();p.color=color.value;if(p.pending_color)delete p.pending_color;changed();render();};row.append(button,color);
+  if(!['duet','unknown'].includes(id)){const remove=document.createElement('button');remove.className='remove';remove.textContent='×';remove.title='删除歌手';remove.setAttribute('aria-label','删除'+p.label);remove.onclick=()=>{const used=doc?.lines.filter(l=>who(l)===id).length||0;if(used&&!confirm(`「${p.label}」已标记 ${used} 句。删除后这些句子将变为未标注，继续吗？`))return;record();if(doc)for(const line of doc.lines)if(who(line)===id){line.singer='unknown';line.singer_status='unassigned';}delete palette[id];if(selected===id)selected='unknown';changed();render();};row.append(remove);}
+  wrap.append(row);if(id!=='unknown'){const name=document.createElement('input');name.type='text';name.className='name-edit';name.value=p.label;name.maxLength=80;name.setAttribute('aria-label','修改'+p.label+'姓名');name.onchange=()=>{if(!name.value.trim()){name.value=p.label;return;}record();p.label=name.value.trim();changed();render();};wrap.append(name);}box.append(wrap);
+ }
+}
+function visibleIndices(){if(!doc)return[];const q=$('search').value.toLocaleLowerCase();return doc.lines.flatMap((line,i)=>((!onlyUnknown||who(line)==='unknown')&&textOf(line).toLocaleLowerCase().includes(q))?[i]:[]);}
+function mark(index,range=false){if(!doc)return;record();const indices=range&&anchor!==null?visibleIndices().filter(i=>i>=Math.min(anchor,index)&&i<=Math.max(anchor,index)):[index];for(const i of indices){doc.lines[i].singer=selected;doc.lines[i].singer_status=selected==='unknown'?'unassigned':'confirmed';}anchor=index;changed();renderLines();say(`已将 ${indices.length} 句标为「${palette[selected].label}」。`);}
+function play(line){const start=startOf(line);if(!audioURL||start===null)return;stopAt=endOf(line);const offset=Number.isFinite(doc.source_offset_seconds)?doc.source_offset_seconds:0;$('audio').currentTime=Math.max(0,start+offset-.2);if(stopAt!==null)stopAt+=offset+.2;$('audio').play().catch(()=>say('播放失败，请检查音频文件。',true));}
+function renderLines(){const list=$('list');list.replaceChildren();for(const i of visibleIndices()){
+ const line=doc.lines[i],sid=who(line),p=palette[sid]||palette.unknown,row=document.createElement('div');row.className='lyric';row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label',`第 ${i+1} 句 ${textOf(line)}，当前 ${p.label}`);row.dataset.index=i;row.style.setProperty('--voice',p.color);row.onclick=e=>mark(i,e.shiftKey);row.onkeydown=e=>{if(e.target===row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();mark(i,e.shiftKey);}};
+ const number=document.createElement('span');number.className='number';number.textContent=String(i+1).padStart(2,'0');
+ const button=document.createElement('button');button.className='play';button.textContent='▶';button.setAttribute('aria-label',`试听第 ${i+1} 句`);button.disabled=!audioURL||startOf(line)===null;button.onclick=e=>{e.stopPropagation();play(line);};
+ const words=document.createElement('div'),text=document.createElement('div');text.className='words';text.textContent=textOf(line);const meta=document.createElement('div');meta.className='line-meta';meta.textContent=line.id+' · '+time(startOf(line))+(endOf(line)!==null?' – '+time(endOf(line)):'');words.append(text,meta);
+ const badge=document.createElement('span');badge.className='badge';badge.textContent=p.label;row.append(number,button,words,badge);list.append(row);
+ }}
+function refresh(){const total=doc?.lines.length||0;$('total').textContent=total;$('assigned').textContent=doc?doc.lines.filter(l=>who(l)!=='unknown').length:0;$('fileName').textContent=originalName||'尚未载入文件';$('dirty').textContent=dirty?'● 有未保存修改':'';$('save').disabled=!doc;$('undo').disabled=!history.length;$('redo').disabled=!future.length;$('onlyUnknown').setAttribute('aria-pressed',String(onlyUnknown));$('onlyUnknown').textContent=onlyUnknown?'显示全部':'只看未标注';$('empty').hidden=!!doc;$('list').hidden=!doc;$('brushName').textContent=palette[selected]?.label||'';$('brushName').style.color=palette[selected]?.color||'';}
+function render(){renderSpeakers();renderLines();refresh();}
+function exportDoc(){if(!doc)throw Error('还没有载入歌词');const out=clone(doc);out.singers=clone(palette);out.singer_legend=Object.keys(palette).filter(id=>id!=='unknown');for(const line of out.lines){if(line.singer===undefined)line.singer='unknown';if(line.singer_status===undefined)line.singer_status=line.singer==='unknown'?'unassigned':'confirmed';}return out;}
+function save(){if(!doc)return;const out=exportDoc(),blob=new Blob([JSON.stringify(out,null,2)+'\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(originalName.replace(/\.(json|lrc|txt)$/i,'')||'lyrics')+'-annotated.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);dirty=false;refresh();say('已另存为新歌词 JSON，原文件未改动。');}
+$('open').onclick=$('openEmpty').onclick=()=>$('file').click();$('file').onchange=e=>load(e.target.files[0]);$('save').onclick=save;$('undo').onclick=undo;$('redo').onclick=redo;$('search').oninput=()=>{anchor=null;renderLines();};$('onlyUnknown').onclick=()=>{onlyUnknown=!onlyUnknown;anchor=null;renderLines();refresh();};
+$('add').onclick=()=>{$('newName').value='';$('addDialog').showModal();$('newName').focus();};$('cancelAdd').onclick=()=>$('addDialog').close();$('addForm').onsubmit=e=>{e.preventDefault();const name=$('newName').value.trim();if(!name)return;record();let n=1;while(Object.hasOwn(palette,'singer_'+n))n++;const id='singer_'+n;palette[id]={label:name,color:$('newColor').value};selected=id;$('addDialog').close();changed();render();};
+$('openAudio').onclick=()=>$('audioFile').click();$('audioFile').onchange=e=>{const file=e.target.files[0];if(!file)return;if(audioURL)URL.revokeObjectURL(audioURL);audioURL=URL.createObjectURL(file);$('audio').src=audioURL;$('audio').hidden=false;$('audioName').textContent=file.name;stopAt=null;renderLines();};$('audio').ontimeupdate=()=>{if(stopAt!==null&&$('audio').currentTime>=stopAt){$('audio').pause();stopAt=null;}};
+window.addEventListener('dragover',e=>{e.preventDefault();document.body.classList.add('drop-active');});window.addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('drop-active');});window.addEventListener('drop',e=>{e.preventDefault();document.body.classList.remove('drop-active');load(e.dataTransfer.files[0]);});
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});window.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();save();}});
+new ResizeObserver(()=>document.documentElement.style.setProperty('--header-height',document.querySelector('header').getBoundingClientRect().height+'px')).observe(document.querySelector('header'));
+render();
+</script>
+</body></html>

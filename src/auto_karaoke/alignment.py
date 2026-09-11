@@ -1,6 +1,7 @@
 """CTC timing and explicit human corrections, adapted from the working preview."""
 import hashlib
 import math
+import re
 import time
 from .project import read_json, write_json
 
@@ -13,10 +14,16 @@ def validate_lyrics(doc):
         if not isinstance(line.get("id"), str) or not line["id"] or line["id"] in ids or not line.get("tokens"):
             raise ValueError("Each lyric line needs a unique ID and tokens")
         ids.add(line["id"])
-        for token in line["tokens"]:
+        languages = line.get('token_languages', [line.get('language', 'ja')] * len(line['tokens']))
+        if len(languages) != len(line['tokens']) or any(lang not in {'ja', 'en'} for lang in languages):
+            raise ValueError('token_languages must contain ja/en for every token')
+        for token, language in zip(line['tokens'], languages):
             if not isinstance(token, list) or len(token) not in (2, 3) or any(not isinstance(v, str) or not v.strip() for v in token):
                 raise ValueError("Token format is [surface, hiragana, optional single-mora Latin pronunciation]")
-            if any(not ('ぁ' <= c <= 'ゖ') for c in token[1]):
+            if language == 'en':
+                if not re.fullmatch(r"[a-zA-Z']+", token[1]):
+                    raise ValueError('English alignment text must contain letters/apostrophes')
+            elif any(not ('ぁ' <= c <= 'ゖ') for c in token[1]):
                 raise ValueError("Write pronunciation in hiragana; expand long vowels explicitly")
 
 
@@ -97,8 +104,9 @@ def align(project):
         tokens = []
         for j, item in enumerate(line['tokens']):
             surface, reading = item[:2]
-            kana = morae(reading)
-            roman = [''.join(s['hepburn'] for s in converter.convert(k)).lower() for k in kana]
+            language = line.get('token_languages', [line.get('language', 'ja')] * len(line['tokens']))[j]
+            kana = [surface] if language == 'en' else morae(reading)
+            roman = [reading.lower()] if language == 'en' else [''.join(s['hepburn'] for s in converter.convert(k)).lower() for k in kana]
             for k, value in enumerate(kana):
                 if value == 'っ':
                     if k + 1 >= len(roman):
@@ -109,10 +117,15 @@ def align(project):
                     raise ValueError('This sample supports pronunciation overrides for one mora only')
                 roman = [item[2]]
             token = {'id': f"{line['id']}-word-{j + 1:02}", 'surface': surface, 'reading': reading, 'reading_verified': False, 'syllables': []}
+            token['language'] = language
+            if line.get('token_singers'):
+                if len(line['token_singers']) != len(line['tokens']):
+                    raise ValueError('token_singers must match the token count')
+                token['singer'] = line['token_singers'][j]
             for k, (ka, ro) in enumerate(zip(kana, roman)):
                 if not ro or any(c not in vocab for c in ro):
                     raise ValueError(f'Unsupported pronunciation {ka}: {ro}')
-                syllable = {'id': f"{token['id']}-mora-{k + 1:02}", 'kana': ka, 'alignment_text': ro, 'char_start': len(chars), 'char_end': len(chars) + len(ro)}
+                syllable = {'id': f"{token['id']}-mora-{k + 1:02}", 'kana': ka, 'unit': 'word' if language == 'en' else 'mora', 'alignment_text': ro, 'char_start': len(chars), 'char_end': len(chars) + len(ro)}
                 chars.extend(ro)
                 token['syllables'].append(syllable)
                 syllables.append(syllable)

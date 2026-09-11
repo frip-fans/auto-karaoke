@@ -13,6 +13,7 @@ dependencies = ["numpy>=1.26,<3", "Pillow>=10,<13", "soundfile>=0.12,<1", "av>=1
 [project.optional-dependencies]
 align = ["torch>=2.5,<3", "transformers>=4.48,<6", "scipy>=1.13,<2"]
 transcribe = ["faster-whisper>=1.1,<2"]
+rhythm = ["librosa>=0.11,<2"]
 separate = ["audio-separator==0.47.0", "onnxruntime>=1.20,<2"]
 
 [project.scripts]

@@ -55,3 +55,12 @@ asr-draft.json
 emissions-report.json
 layout.json
 render-report.json
+
+# Local provider credentials for the delegated coding helper.
+/.claude/settings.local.json
+/.claude/worktrees/
+
+# Portable player's private library and runtime files.
+/player/songs/
+/player/.venv/
+.karaoke-cache/
