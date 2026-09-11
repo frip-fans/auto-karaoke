@@ -1,6 +1,25 @@
 # auto-karaoke
 
+**中文** · [English](README.en.md) · [日本語](README.ja.md)
+
 日语卡拉 OK 视频制作工具。支持音轨分离、歌词对齐、汉字注音、逐词／音拍扫色和歌手配色，输出伴奏与纯人声双轨 MP4。
+
+## 示例
+
+汉字注音、上下交替歌词和歌手配色：
+
+![日语卡拉 OK 字幕与歌手配色](docs/images/sample-japanese.jpg)
+
+<details>
+<summary>片头标题与英文歌词</summary>
+
+![片头标题](docs/images/sample-title.jpg)
+
+![保留原视频画面的英文歌词](docs/images/sample-english.jpg)
+
+</details>
+
+[截图来源](docs/images/README.md)
 
 | Skill | 用途 |
 | --- | --- |
@@ -46,4 +65,4 @@ $karaoke-render 用已确认的时间轴和 background.png 生成 1080p 视频�
 
 ## License
 
-[GPLv3](LICENSE) (`GPL-3.0-only`)。第三方依赖与模型权重遵循各自的许可证。
+[GPLv3](LICENSE) (`GPL-3.0-only`)。第三方依赖与模型权重遵循各自的许可证。示例截图中的第三方画面与歌词不适用本项目的代码许可证。

@@ -62,3 +62,8 @@ render-report.json
 
 # Rebuildable audio caches in local portable libraries.
 .karaoke-cache/
+
+# Explicit README samples requested by the project owner.
+!/docs/images/sample-title.jpg
+!/docs/images/sample-japanese.jpg
+!/docs/images/sample-english.jpg

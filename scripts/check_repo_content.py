@@ -1,5 +1,6 @@
-"""Audit staged/tracked text only. This cannot determine copyright ownership."""
+"""Audit code/docs and exact approved samples. This cannot determine copyright ownership."""
 from pathlib import Path
+import hashlib
 import re
 import subprocess
 import sys
@@ -14,6 +15,8 @@ ALLOWED_NAMES = {'LICENSE', 'plugins/auto-karaoke/LICENSE', '.gitignore', 'examp
                  'player/static/audio.js', 'player/static/display.html', 'player/static/display.js',
                  'player/tests/browser.cjs', 'plugins/auto-karaoke/.codex-plugin/plugin.json',
                  '.agents/plugins/marketplace.json'}
+# Only these reviewed screenshot bytes are allowed; all other media remain forbidden.
+ALLOWED_SCREENSHOTS = {'docs/images/sample-english.jpg': '38a7e56cb44485ccb42f1bf5ce8a731ecfacc36a458cb6c17347108daa1b23da', 'docs/images/sample-japanese.jpg': 'edfb2858e2b3ae4c6ebc34b3c0c18689a93a24239dce8659b70c794f94939f22', 'docs/images/sample-title.jpg': '07bc6aa707e8bb86a48aeb5ee49258b7710a20e2a7fcd1bace336e045da386b0'}
 FORBIDDEN_PARTS = {'.local', 'work', 'input', 'output', 'models', 'cache', '.venv', '__pycache__'}
 
 
@@ -22,6 +25,9 @@ def git(*args):
 
 
 def inspect(name, data):
+    if name in ALLOWED_SCREENSHOTS:
+        valid = len(data) <= 512 * 1024 and hashlib.sha256(data).hexdigest() == ALLOWED_SCREENSHOTS[name]
+        return [] if valid else [f"{name}: screenshot differs from the reviewed sample"]
     path = Path(name)
     problems = []
     if name not in ALLOWED_NAMES and path.suffix.lower() not in ALLOWED_SUFFIXES:
@@ -77,7 +83,7 @@ def main():
     if not seen:
         print('No indexed files to audit; stage the intended source files first.', file=sys.stderr)
         return 1
-    print(f'Checked {len(seen)} unique indexed/historical file versions: UTF-8 code/docs only.')
+    print(f'Checked {len(seen)} unique indexed/historical file versions: code/docs and explicitly approved screenshot samples.')
     return 0
 
 
