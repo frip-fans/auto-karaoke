@@ -32,6 +32,8 @@ The player is a separate project: [auto-karaoke-player](https://github.com/frip-
 
 ## Installation
 
+Using Claude Code? See the [plugin installation instructions](plugins/auto-karaoke/README.md#claude-code). You can also follow the [manual CLI installation guide](docs/manual-install.md) (Chinese) to run the tools directly from your terminal.
+
 You need a computer that runs Codex, available disk space, and internet access for the initial installation. Production uses Python 3.11+, FFmpeg, and a Japanese font for subtitle rendering. An NVIDIA GPU is recommended for separation and alignment; CPU execution is possible but slower. The plugin checks your hardware and the backend required by the selected model.
 
 Install the plugin from this repository's root directory. You do not need to set up Python first:

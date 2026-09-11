@@ -1,0 +1,16 @@
+{
+  "name": "frip-fans",
+  "owner": {
+    "name": "frip-fans"
+  },
+  "plugins": [
+    {
+      "name": "auto-karaoke",
+      "source": "./plugins/auto-karaoke",
+      "description": "Local audio separation, reviewed karaoke authoring and dual-stem video rendering."
+    }
+  ],
+  "metadata": {
+    "description": "Karaoke production skills for audio separation, lyric review and video rendering."
+  }
+}

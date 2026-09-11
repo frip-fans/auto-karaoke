@@ -4,19 +4,7 @@
 
 ## 安装与运行
 
-建议 Python 3.12。GPU PC 的安装和验收步骤见 [本地 GPU PC / Codex 交接](local-pc.md)。仅使用已对齐数据生成字幕和视频时，基础依赖不包含 PyTorch。
-
-```bash
-python -m venv .venv
-# Linux / macOS / WSL
-source .venv/bin/activate
-# Windows PowerShell 改用：.venv\Scripts\Activate.ps1
-python -m pip install -e .
-# 需要声学对齐时，再安装对应平台的 PyTorch，然后：
-python -m pip install -e '.[align]'
-```
-
-还需要带 `ass` 滤镜和 `libx264` 编码器的 FFmpeg，以及单字体 TTF/OTF 日文字体。字体不随仓库分发；TTC 字体集合暂不支持。`font_family` 必须对应 `font_path` 中实际字体的家族名。
+首次安装请先阅读 [手动安装 CLI](manual-install.md)，无需 Codex。以下步骤假定已激活虚拟环境，并安装所需扩展、FFmpeg 与日文字体。
 
 把所有素材、歌词和项目配置放在 Git 忽略的 `.local/` 下：
 

@@ -32,6 +32,8 @@
 
 ## 安装
 
+使用 Claude Code？参见 [插件安装说明](plugins/auto-karaoke/README.md#claude-code)。也可以 [手动安装 CLI](docs/manual-install.md)，可直接在终端完成制作。
+
 需要可运行 Codex 的电脑、可用磁盘空间及首次安装时的网络连接。制作工具使用 Python 3.11+、FFmpeg；渲染日语字幕还需要日文字体。分离和对齐建议使用 NVIDIA GPU，CPU 也可运行，但速度较慢。具体模型能否运行，由插件检查硬件和所需后端。
 
 在本仓库根目录安装插件，无需先手动配置 Python 环境：

@@ -1,0 +1,9 @@
+{
+  "name": "auto-karaoke",
+  "version": "0.1.0",
+  "description": "Local audio separation, reviewed karaoke authoring and dual-stem video rendering.",
+  "author": {
+    "name": "frip-fans"
+  },
+  "license": "GPL-3.0-only"
+}
